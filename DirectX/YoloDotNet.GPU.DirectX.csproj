@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	  <TargetFramework>net8.0</TargetFramework>
+	  <TargetFramework>net8.0-windows</TargetFramework>
 	  <ImplicitUsings>enable</ImplicitUsings>
 	  <Nullable>enable</Nullable>
 	  <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
@@ -28,20 +28,14 @@
 		  Pose Estimation
 	  </Description>
 	  <Authors>Ha ves;Nick Swardh</Authors>
-	  <Version>2.2</Version>
+	  <Version>2.2.1</Version>
 	  <Company />
 	  <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-	  <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
+	  <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
 	  <PackageReleaseNotes>
-		  Things are moving fast, YoloDotNet 2.2 is already here packed with exciting new features! Ever wanted to experiment with Yolo-World models in .NET? Now's your chance. With Open-Vocabulary detection and real-time, zero-shot object detection, the model can now find objects it hasn't even been trained on. It's a whole new level of object detection fun!
-
-		  In v2.2:
-
-		  Yolo-World Support:
-		  Yep, you read that right – Open-Vocabulary detection is now in the mix! Real-time, zero-shot object detection is here, so the model can spot  stuff it’s never been trained on. Mind-blowing, right?
-
-		  Pixel Confidence for Segmentation:
-		  Need more control? An optional pixel confidence parameter has been added for segmentation. Now it's possible to fine-tune those segmentation masks like a pro ;)
+		  First release.
+		  
+		  Includes Rgba32 to (Dense)Tensor pre processing on GPU.
 	  </PackageReleaseNotes>
 	  <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
 	  <PackageOutputPath>C:\Users\admin\source\repos\Local NuGet Packages</PackageOutputPath>
