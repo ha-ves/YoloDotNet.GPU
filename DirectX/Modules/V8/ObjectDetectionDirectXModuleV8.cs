@@ -27,7 +27,9 @@ namespace YoloDotNet.GPU.Modules.V8
 
         public List<ObjectDetection> ProcessImage(SKImage image, double confidence, double pixelConfidence, double iou)
         {
-            yoloCore
+            var outputTensor = yoloCore.Run(image);
+
+            return null;
         }
 
         public Dictionary<int, List<ObjectDetection>> ProcessVideo(VideoOptions options, double confidence, double pixelConfidence, double iou)
