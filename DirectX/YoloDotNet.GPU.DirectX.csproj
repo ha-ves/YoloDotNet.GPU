@@ -44,7 +44,7 @@
   </PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="ComputeSharp.D3D12MemoryAllocator" Version="3.0.1" />
+		<PackageReference Include="ComputeSharp.D3D12MemoryAllocator" Version="3.1.0" />
 	</ItemGroup>
 
 	<ItemGroup>
