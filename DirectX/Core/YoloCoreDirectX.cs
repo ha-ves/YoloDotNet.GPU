@@ -38,13 +38,14 @@ namespace YoloDotNet.GPU.Core
 
         //private UploadTexture2D<int>? _skBmpHost_Write;
         private nint _skBmpHost_Write;
-        private ReadOnlyTexture2D<int>? _rgbaDataGPU_In;
+        //private ReadOnlyTexture2D<int>? _rgbaDataGPU_In;
+        private ReadOnlyTexture2D<Bgra32, Float4>? _rgbaDataGPU_In;
 
         private ReadWriteTexture3D<float>? _normTensorGPU_Out;
         //private ReadBackTexture3D<float>? _inputTensorHost_Read;
         private nint _ortTensorHost_Read;
 
-        private Dictionary<string, OrtValue> inputNames;
+        private Dictionary<string, OrtValue>? inputNames;
 
         private unsafe void InitializeDirectCompute()
         {
@@ -55,7 +56,8 @@ namespace YoloDotNet.GPU.Core
 
             _skBmpHost_Write = Marshal.AllocHGlobal(_imageInfo.BytesSize);
             //_skBmpHost_Write = GPU!.AllocateUploadTexture2D<int>(OnnxModel.Input.Width, OnnxModel.Input.Height, AllocationMode.Clear);
-            _rgbaDataGPU_In = GPU!.AllocateReadOnlyTexture2D<int>(OnnxModel.Input.Width, OnnxModel.Input.Height, AllocationMode.Clear);
+            //_rgbaDataGPU_In = GPU!.AllocateReadOnlyTexture2D<int>(OnnxModel.Input.Width, OnnxModel.Input.Height, AllocationMode.Clear);
+            _rgbaDataGPU_In = GPU!.AllocateReadOnlyTexture2D<Bgra32, Float4>(OnnxModel.Input.Width, OnnxModel.Input.Height, AllocationMode.Clear);
 
             _normTensorGPU_Out = GPU!.AllocateReadWriteTexture3D<float>(OnnxModel.Input.Width, OnnxModel.Input.Height, OnnxModel.Input.Channels, AllocationMode.Clear);
             //_inputTensorHost_Read = GPU!.AllocateReadBackTexture3D<float>(OnnxModel.Input.Width, OnnxModel.Input.Height, OnnxModel.Input.Channels, AllocationMode.Clear);
@@ -107,9 +109,11 @@ namespace YoloDotNet.GPU.Core
                 var (batchSize, colorChannels, width, height) = ((int)OnnxModel.InputShape[0], (int)OnnxModel.InputShape[1], (int)OnnxModel.InputShape[2], (int)OnnxModel.InputShape[3]);
                 var pixelsPerChannel = _tensorBufferSize / colorChannels;
 
-                PrepareImageData(image);
+                //PrepareImageData(image);
 
-                GPU!.For(width, height, new NormalizeRgbaToSingleTensor(_rgbaDataGPU_In!, _normTensorGPU_Out!));
+                //GPU!.For(width, height, new NormalizeRgbaToSingleTensor(_rgbaDataGPU_In!, _normTensorGPU_Out!));
+                //GPU!.For(width, height, new NormalizePixelsToTensorSingle_2D(_rgbaDataGPU_In!, _normTensorGPU_Out!));
+                GPU!.For(width, height, colorChannels, new NormalizePixelsToTensorSingle_3D(_rgbaDataGPU_In!, _normTensorGPU_Out!));
 
                 #warning its bad to copy back and forth, but afaik, can only directly interop with DirectML.
                 //TODO: Directly use the D3D12Resource with DirectML
@@ -118,7 +122,7 @@ namespace YoloDotNet.GPU.Core
                     _normTensorGPU_Out!.CopyTo(new Span<float>((void*)_ortTensorHost_Read!, _tensorBufferSize));
                 }
 
-                return _session.Run(_runOptions, inputNames, OnnxModel.OutputNames);
+                return _session.Run(_runOptions, inputNames!, OnnxModel.OutputNames);
             }
         }
 
@@ -155,7 +159,8 @@ namespace YoloDotNet.GPU.Core
 
                 _resizeInfo = new SKRectI()
                 {
-                    Left = x, Top = y,
+                    Left = x,
+                    Top = y,
                     Size = new(newWidth, newHeight)
                 };
             }
@@ -165,7 +170,7 @@ namespace YoloDotNet.GPU.Core
 
             unsafe
             {
-                _rgbaDataGPU_In!.CopyFrom(new ReadOnlySpan<int>((void*)_skBmpHost_Write, _imageInfo.Width * _imageInfo.Height));
+                _rgbaDataGPU_In!.CopyFrom(MemoryMarshal.Cast<int, Bgra32>(new ReadOnlySpan<int>((void*)_skBmpHost_Write, _imageInfo.Width * _imageInfo.Height)));
             }
         }
     }
